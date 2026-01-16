@@ -19,7 +19,7 @@ const tools = files.map(file => {
     filename: file,
     url: `./tools/${file}`,
     title: $('title').text() || file,
-    description: $('description').text() || 'No description provided.',
+    description: $('meta[name="description"]').attr('content') || 'No description provided.',
   };
 });
 
