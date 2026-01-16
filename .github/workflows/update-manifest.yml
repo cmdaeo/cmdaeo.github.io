@@ -1,0 +1,31 @@
+name: Update Tools Manifest
+on:
+  push:
+    paths:
+      - 'tools/*.html'  # Triggers only when tools change
+      - '.github/scripts/generate-manifest.js' # Or when you update the script
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Dependencies
+        run: npm install cheerio
+        
+      - name: Generate Manifest
+        run: node .github/scripts/generate-manifest.js
+        
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-update tools-manifest.json"
+          file_pattern: tools-manifest.json
