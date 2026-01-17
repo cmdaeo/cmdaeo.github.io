@@ -4,5 +4,11 @@
     "url": "./tools/bg-remover.html",
     "title": "Background Removal Tool",
     "description": "Easily remove background from images"
+  },
+  {
+    "filename": "regex-pattern.html",
+    "url": "./tools/regex-pattern.html",
+    "title": "Regex Pattern Builder",
+    "description": "A helper to create regex patterns"
   }
 ]
