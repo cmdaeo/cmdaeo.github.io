@@ -1,5 +1,11 @@
 [
   {
+    "filename": "ac1-lol.html",
+    "url": "./tools/ac1-lol.html",
+    "title": "Resumo AC1 - MIPS 32-bit",
+    "description": "No description provided."
+  },
+  {
     "filename": "bg-remover.html",
     "url": "./tools/bg-remover.html",
     "title": "Background Removal Tool",
