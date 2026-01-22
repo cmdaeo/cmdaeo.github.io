@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumo AC1 - MIPS 32-bit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --border: #475569;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            padding: 20px;
+            font-size: 17px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            padding: 32px 24px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            color: white;
+        }
+
+        section {
+            background: var(--bg-secondary);
+            padding: 24px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            font-size: 22px;
+            color: var(--accent-light);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 19px;
+            color: var(--text-primary);
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        code {
+            background: var(--bg-card);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            color: var(--accent-light);
+        }
+
+        .highlight {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 40px;
+                font-size: 18px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            h2 {
+                font-size: 26px;
+            }
+
+            h3 {
+                font-size: 21px;
+            }
+
+            section {
+                padding: 32px;
+            }
+
+            header {
+                padding: 40px 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RESUMO GERAL – AC1</h1>
+            <div class="subtitle">MIPS 32-bit</div>
+        </header>
+
+        <section>
+            <h2>FORMATOS DE INSTRUÇÃO E MODOS DE ENDEREÇAMENTO</h2>
+            
+            <h3>Formato R (Register)</h3>
+            <ul>
+                <li><strong>Campos:</strong> opcode(6), rs(5), rt(5), rd(5), shamt(5), funct(6)</li>
+                <li>Operandos em registos (Register Addressing)</li>
+                <li><strong>Exemplos:</strong> add, sub, and, or, slt, jr</li>
+            </ul>
+
+            <h3>Formato I (Immediate)</h3>
+            <ul>
+                <li><strong>Campos:</strong> opcode(6), rs(5), rt(5), immediate(16)</li>
+                <li><strong>Modos:</strong>
+                    <ul>
+                        <li>Immediate Addressing: constantes (addi, andi, ori, slti, etc.)</li>
+                        <li>Base/Displacement: acesso à memória (lw, sw, lb, sb, etc.)</li>
+                        <li>PC-Relative: branches (beq, bne)</li>
+                    </ul>
+                </li>
+                <li><strong>IMPORTANTE:</strong> Destino é SEMPRE rt (não existe rd)</li>
+            </ul>
+
+            <h3>Formato J (Jump)</h3>
+            <ul>
+                <li><strong>Campos:</strong> opcode(6), address(26)</li>
+                <li><strong>Modo:</strong> Pseudo-Direct Addressing</li>
+                <li><strong>Exemplos:</strong> j, jal</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>MEMÓRIA, ENDEREÇAMENTO E ALINHAMENTO</h2>
+            
+            <h3>Mapa típico de memória MIPS</h3>
+            <ul>
+                <li><strong>Segmento de Código (.text / instruções):</strong> começa em 0x00400000</li>
+                <li><strong>Segmento de Dados estáticos (.data, .bss):</strong> começa em 0x10010000</li>
+                <li><strong>Heap:</strong> cresce para endereços MAIORES</li>
+                <li><strong>Stack:</strong> cresce para BAIXO
+                    <ul>
+                        <li>Stack Pointer: $sp</li>
+                        <li>Push/alocar: $sp = $sp - N</li>
+                        <li>Pop/libertar: $sp = $sp + N</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Endianess (Little Endian)</h3>
+            <ul>
+                <li>Byte menos significativo fica no endereço mais baixo</li>
+                <li><strong>Exemplo:</strong>
+                    <ul>
+                        <li>Mem = 0x12, Mem = 0x34, Mem = 0x56, Mem = 0x78</li>
+                        <li>Palavra lida por lw = 0x78563412</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Alinhamento</h3>
+            <ul>
+                <li>Words (4 bytes) devem estar em endereços múltiplos de 4</li>
+                <li><strong>Exemplos válidos:</strong> 0x...00, 0x...04, 0x...08, 0x...0C</li>
+                <li>Acessos desalinhados (ex: lw em 0x10010001) causam exceção</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>EXTENSÃO DE BITS (16 → 32)</h2>
+            
+            <h3>Sign Extension (extensão de sinal)</h3>
+            <ul>
+                <li>Copia o bit de sinal (bit 15) para os bits 16..31</li>
+                <li><strong>Usado em:</strong>
+                    <ul>
+                        <li>Aritmética: addi, slti</li>
+                        <li>Endereçamento: lw, sw, lb, lh, sb, sh</li>
+                        <li>Branches: beq, bne (offset é sinalizado)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Zero Extension</h3>
+            <ul>
+                <li>Preenche os bits 16..31 com zero</li>
+                <li><strong>Usado em:</strong>
+                    <ul>
+                        <li>Instruções lógicas imediatas: andi, ori, xori</li>
+                        <li>Algumas instruções de load unsigned: lbu, lhu (após o load, o valor é zero-extended)</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>PIPELINE DE 5 ESTÁGIOS (IF | ID | EX | MEM | WB)</h2>
+            
+            <h3>Estágios</h3>
+            <div class="highlight">
+                <p><strong>1. IF (Instruction Fetch)</strong></p>
+                <ul>
+                    <li>Lê instrução da memória de instruções</li>
+                    <li>PC = PC + 4 (por omissão)</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <p><strong>2. ID (Instruction Decode / Register Fetch)</strong></p>
+                <ul>
+                    <li>Decodifica opcode</li>
+                    <li>Lê registos (rs, rt)</li>
+                    <li>Extensão de imediato</li>
+                    <li>Unidade de controlo gera sinais</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <p><strong>3. EX (Execute / Address Calculation)</strong></p>
+                <ul>
+                    <li>ALU executa operação (aritmética/lógica)</li>
+                    <li>Calcula endereço de memória (lw, sw)</li>
+                    <li>Calcula condição e alvo de branch</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <p><strong>4. MEM (Memory Access)</strong></p>
+                <ul>
+                    <li>Leitura/escrita na memória de dados (lw, sw, lb, sb, etc.)</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <p><strong>5. WB (Write Back)</strong></p>
+                <ul>
+                    <li>Escreve resultado no registo destino (rt ou rd)</li>
+                </ul>
+            </div>
+
+            <h3>Tipos de Hazards</h3>
+            <p><strong>1. Structural Hazard</strong></p>
+            <ul>
+                <li>Falta de hardware partilhado (ex: uma só memória para instruções e dados)</li>
+                <li><strong>Solução:</strong> memória separada (Harvard) ou duplicação de recursos</li>
+            </ul>
+
+            <p><strong>2. Data Hazard</strong></p>
+            <ul>
+                <li>Instrução depende do resultado de outra ainda no pipeline</li>
+                <li><strong>Soluções:</strong>
+                    <ul>
+                        <li>Forwarding (bypass)</li>
+                        <li>Stalls (inserir NOPs)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <p><strong>3. Control Hazard</strong></p>
+            <ul>
+                <li>Instruções após branches/jumps podem não ser as corretas</li>
+                <li><strong>Soluções:</strong>
+                    <ul>
+                        <li>Branch Prediction</li>
+                        <li>Branch Delay Slot</li>
+                        <li>Avaliar o branch mais cedo no pipeline</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Regra de Ouro dos Data Hazards com Forwarding</h3>
+            <ul>
+                <li><strong>ALU → ALU</strong> (ex: add seguido de sub): Com forwarding = 0 stalls</li>
+                <li><strong>Load → Use imediato</strong> (lw seguido no ciclo seguinte que usa o registo carregado): Mesmo com forwarding = 1 STALL obrigatório</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>PERFORMANCE E TEMPO DE EXECUÇÃO</h2>
+            
+            <h3>Single Cycle</h3>
+            <ul>
+                <li>Cada instrução faz todos os estágios num único ciclo</li>
+                <li>T_ciclo = Caminho crítico (típico: lw)</li>
+                <li>CPI = 1</li>
+                <li>Frequência baixa (ciclo longo)</li>
+            </ul>
+
+            <h3>Pipeline</h3>
+            <ul>
+                <li>Cada estágio ocupa um ciclo</li>
+                <li>T_ciclo = tempo do estágio MAIS LENTO + overhead dos registos de pipeline</li>
+                <li>CPI ideal ≈ 1 (com muitas instruções e sem hazards)</li>
+                <li>CPI real > 1 (devido a stalls, flushes de branch, etc.)</li>
+                <li>Frequência muito maior que no single cycle</li>
+            </ul>
+
+            <h3>Fórmula do Tempo de CPU</h3>
+            <p><strong>Tempo_CPU = N_instruções × CPI × T_ciclo</strong></p>
+        </section>
+
+        <section>
+            <h2>BRANCHES, JUMPS E PC</h2>
+            
+            <h3>Branch (beq, bne) – PC-Relative</h3>
+            <ul>
+                <li><strong>Alvo =</strong> (PC + 4) + (offset << 2)</li>
+                <li>Offset: imediato de 16 bits, sinalizado, em palavras (é multiplicado por 4)</li>
+                <li>Alcance aproximado: ±128 KB à volta do (PC + 4)</li>
+            </ul>
+
+            <h3>Jump (j, jal) – Pseudo-Direct</h3>
+            <ul>
+                <li><strong>Endereço alvo =</strong> (PC + 4)[31:28] concat (index << 2)</li>
+                <li>index: campo de 26 bits da instrução</li>
+                <li>Mantém os 4 bits mais significativos de PC+4</li>
+            </ul>
+
+            <h3>Branch Delay Slot</h3>
+            <ul>
+                <li>A instrução imediatamente a seguir ao branch/jump é SEMPRE executada</li>
+                <li>O compilador/assembly deve colocar aí algo útil ou um NOP</li>
+            </ul>
+
+            <h3>Registo $ra e jal</h3>
+            <ul>
+                <li>jal guarda (PC + 4) em $ra</li>
+                <li>jr $ra volta para a função chamadora</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>REGISTOS, CONVENÇÕES E ESPECIAIS</h2>
+            
+            <h3>Convenções de Registos Inteiros</h3>
+            <ul>
+                <li><code>$zero ($0)</code>: lê sempre 0; qualquer escrita é ignorada</li>
+                <li><code>$at ($1)</code>: assembler temporary (reservado pelo assembler)</li>
+                <li><code>$v0–$v1 ($2–$3)</code>: valores de retorno</li>
+                <li><code>$a0–$a3 ($4–$7)</code>: argumentos de funções</li>
+                <li><code>$t0–$t7 ($8–$15)</code>: temporários (caller-saved)</li>
+                <li><code>$s0–$s7 ($16–$23)</code>: saved registers (callee-saved)</li>
+                <li><code>$t8–$t9 ($24–$25)</code>: temporários adicionais</li>
+                <li><code>$k0–$k1 ($26–$27)</code>: reservados para o SO</li>
+                <li><code>$gp ($28)</code>: global pointer</li>
+                <li><code>$sp ($29)</code>: stack pointer</li>
+                <li><code>$fp ($30)</code>: frame pointer</li>
+                <li><code>$ra ($31)</code>: return address (jal)</li>
+            </ul>
+
+            <h3>Registos temporários (t0–t9)</h3>
+            <ul>
+                <li>A função CHAMADA pode usá-los e "estragá-los" à vontade</li>
+                <li>Quem chama é responsável por guardar/restaurar se precisar deles depois</li>
+            </ul>
+
+            <h3>Registos guardados (s0–s7)</h3>
+            <ul>
+                <li>Se a função CHAMADA os quiser usar, TEM de:
+                    <ul>
+                        <li>Guardar na stack no início</li>
+                        <li>Restaurar da stack antes de retornar</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Registos hi/lo</h3>
+            <ul>
+                <li><code>mult / multu</code>: resultado de 64 bits vai para hi:lo</li>
+                <li><code>div / divu</code>: quociente em lo, resto em hi</li>
+                <li><strong>Acesso:</strong>
+                    <ul>
+                        <li><code>mfhi rd</code></li>
+                        <li><code>mflo rd</code></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>ARITMÉTICA, OVERFLOW E REPRESENTAÇÃO</h2>
+            
+            <h3>Representação Signed vs Unsigned</h3>
+            <ul>
+                <li>Signed em complemento para 2 (C2)</li>
+                <li>Unsigned: todos os bits fazem parte do valor</li>
+            </ul>
+
+            <h3>Overflow em Unsigned</h3>
+            <ul>
+                <li>"Carry out" do bit mais significativo indica overflow (em operações sem sinal)</li>
+                <li>MIPS não gera exceção; valores "rolam" modulo 2³²</li>
+            </ul>
+
+            <h3>Overflow em Signed (C2)</h3>
+            <ul>
+                <li>Carry out não é indicação de overflow</li>
+                <li><strong>Overflow ocorre se:</strong> Dois operandos com o MESMO sinal produzem resultado com sinal DIFERENTE</li>
+                <li>Instruções como <code>add</code> e <code>sub</code> podem gerar exceção em overflow</li>
+                <li>Versões sem sinal (<code>addu</code>, <code>subu</code>) ignoram overflow</li>
+            </ul>
+
+            <h3>Regra útil</h3>
+            <p>overflow = carry_in_bit_ms XOR carry_out_bit_ms (para soma binária)</p>
+        </section>
+
+        <section>
+            <h2>IEEE 754 – FLOATING POINT 32-bit (SINGLE PRECISION)</h2>
+            
+            <h3>Formato</h3>
+            <ul>
+                <li>1 bit de sinal (S)</li>
+                <li>8 bits de expoente (E, com bias 127)</li>
+                <li>23 bits de mantissa (M, fracção)</li>
+                <li><strong>Valor:</strong>
+                    <ul>
+                        <li>Normalizados: (-1)^S × 1.M × 2^(E - 127)</li>
+                        <li>Denormais: (-1)^S × 0.M × 2^(-126)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Casos Especiais</h3>
+            <ul>
+                <li><strong>Zero:</strong> E = 0, M = 0</li>
+                <li><strong>Infinito:</strong> E = 255, M = 0</li>
+                <li><strong>NaN:</strong> E = 255, M ≠ 0</li>
+                <li><strong>Denormal:</strong> E = 0, M ≠ 0</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>SINAIS DE CONTROLO (DATAPATH MIPS)</h2>
+            
+            <h3>Principais sinais</h3>
+            <ul>
+                <li><strong>RegDst:</strong> 0 → destino é rt (formato I); 1 → rd (formato R)</li>
+                <li><strong>ALUSrc:</strong> 0 → 2.º operando vem de registo; 1 → imediato</li>
+                <li><strong>MemtoReg:</strong> 0 → valor da ALU para registo; 1 → dado da memória</li>
+                <li><strong>RegWrite:</strong> habilita escrita no banco de registos</li>
+                <li><strong>MemRead:</strong> leitura da memória de dados (lw)</li>
+                <li><strong>MemWrite:</strong> escrita na memória de dados (sw)</li>
+                <li><strong>Branch:</strong> indica que a instrução é branch</li>
+                <li><strong>PCSrc:</strong> seleciona próximo PC (PC+4 ou alvo do branch)</li>
+                <li><strong>ALUOp:</strong> código que indica à ALU qual operação fazer</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>ARQUITETURA E ORGANIZAÇÃO</h2>
+            
+            <h3>Harvard</h3>
+            <ul>
+                <li>Memórias/barramentos separados para instruções e dados</li>
+                <li>Permite IF e MEM no mesmo ciclo sem conflito</li>
+                <li>Reduz structural hazards</li>
+            </ul>
+
+            <h3>Von Neumann</h3>
+            <ul>
+                <li>Memória única para dados e instruções</li>
+                <li>Partilha o mesmo barramento → gargalo (Von Neumann bottleneck)</li>
+            </ul>
+
+            <h3>Lei de Amdahl</h3>
+            <p><strong>Speedup_total = 1 / ((1 - f) + f / S)</strong></p>
+            <ul>
+                <li>f: fração do tempo que é melhorada</li>
+                <li>S: speedup da parte melhorada</li>
+                <li>O ganho global é limitado pela parte que não foi acelerada</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>HARDWARE DO PIPELINE (BLOCOS IMPORTANTES)</h2>
+            
+            <h3>Forwarding Unit (no EX)</h3>
+            <ul>
+                <li>Lógica combinatória</li>
+                <li>Compara registos de destino (em EX/MEM, MEM/WB) com rs/rt em ID/EX</li>
+                <li><strong>Decide se a entrada da ALU vem de:</strong>
+                    <ul>
+                        <li>Registo lido em ID</li>
+                        <li>Resultado em EX/MEM</li>
+                        <li>Resultado em MEM/WB</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Hazard Detection Unit (no ID)</h3>
+            <ul>
+                <li>Deteta load-use hazards (quando instrução em ID depende de um lw em EX)</li>
+                <li><strong>Ações típicas:</strong>
+                    <ul>
+                        <li>Congelar PC e IF/ID (não avançar)</li>
+                        <li>Inserir NOP em ID/EX (bolha)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Registos de Pipeline</h3>
+            <ul>
+                <li>IF/ID, ID/EX, EX/MEM, MEM/WB</li>
+                <li><strong>Guardam:</strong>
+                    <ul>
+                        <li>PC (tipicamente PC+4)</li>
+                        <li>Operandos</li>
+                        <li>Imediatos</li>
+                        <li>Sinais de controlo relevantes para o estágio seguinte</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Unidade de Controlo</h3>
+            <ul>
+                <li>Lógica combinatória (tipicamente implementada como tabela verdade/ROM)</li>
+                <li><strong>Entrada:</strong> opcode (e às vezes funct)</li>
+                <li><strong>Saída:</strong> sinais de controlo (RegDst, ALUSrc, MemRead, MemWrite, Branch, MemtoReg, RegWrite, ALUOp, etc.)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>OUTROS FACTOS ÚTEIS</h2>
+            <ul>
+                <li>1 char = 1 byte</li>
+                <li>1 word = 4 bytes</li>
+                <li><code>lw / sw</code>: acesso a word (4 bytes, alinhado)</li>
+                <li><code>lb / sb</code>: acesso a byte</li>
+                <li><code>lh / sh</code>: acesso a halfword (2 bytes, alinhado)</li>
+                <li><strong>Em chamadas de função:</strong>
+                    <ul>
+                        <li>Argumentos extra (para além de a0–a3) vão pela stack</li>
+                        <li>Endereço de retorno em $ra</li>
+                        <li>Convenções de caller-saved e callee-saved são obrigatórias para código "bem-comportado"</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>
