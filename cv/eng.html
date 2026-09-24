@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curriculum Vitae - Miguel Macedo</title>
+<style>
+  :root {
+    --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    --ink: #111111;
+    --muted: #444444;
+    --faint: #777777;
+    --line: #111111;
+    --paper: #ffffff;
+  }
+
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ececec;
+    font-family: var(--font-primary);
+    color: var(--ink);
+    font-size: 8.4pt;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sheet {
+    background: var(--paper);
+    width: 210mm;
+    height: 297mm;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Corner accents */
+  .sheet::before,
+  .sheet::after {
+    content: "";
+    position: absolute;
+    width: 6mm;
+    height: 6mm;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .sheet::before {
+    top: 3mm;
+    left: 3mm;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+  }
+  .sheet::after {
+    top: 3mm;
+    right: 3mm;
+    border-top: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+  }
+  .mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
+
+  /* Header */
+  header {
+    padding: 9mm 12mm 6mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2.5px solid var(--line);
+  }
+  .name-plain {
+    font-size: 24pt;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .role-line {
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+  .contact-block { text-align: right; font-size: 7.8pt; line-height: 1.5; }
+  .contact-block a { color: var(--ink); text-decoration: none; border-bottom: 1px solid #ccc; }
+
+  /* Fact strip */
+  .factstrip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1.5px solid var(--line);
+  }
+  .fact {
+    padding: 5px 4px 5px 0;
+    margin-left: 12mm;
+    border-right: 1px solid #ddd;
+    font-size: 7.2pt;
+  }
+  .fact:last-child { border-right: none; }
+  .fact .lbl {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    color: var(--faint);
+    font-size: 6.2pt;
+    letter-spacing: 0.03em;
+    display: block;
+    margin-bottom: 1px;
+  }
+  .fact .val { font-weight: 700; font-size: 7.4pt; }
+
+  /* Main grid */
+  .grid-container {
+    display: grid;
+    grid-template-columns: 58mm 1fr;
+    flex-grow: 1;
+  }
+  .sidebar {
+    padding: 7mm 6mm 7mm 12mm;
+    border-right: 1.5px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 6mm;
+  }
+  .main-col {
+    padding: 7mm 12mm 7mm 7mm;
+    display: flex;
+    flex-direction: column;
+    gap: 5.5mm;
+  }
+  section { display: flex; flex-direction: column; gap: 4px; }
+  .sec-title {
+    font-size: 7.8pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1.5px solid var(--line);
+    padding-bottom: 3px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .sec-title span {
+    font-family: var(--font-mono);
+    font-size: 6.5pt;
+    color: var(--faint);
+    font-weight: 600;
+  }
+  .tag-group { display: flex; flex-direction: column; gap: 4px; }
+  .tag-item strong {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--faint);
+  }
+  .tag-item span { font-size: 7.8pt; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 3.5px; margin-top: 3px; }
+  .chip {
+    font-size: 6.2pt;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    border: 1px solid var(--line);
+    padding: 1.5px 5px;
+    border-radius: 2px;
+  }
+  .chip.fill { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .lang-item { display: flex; justify-content: space-between; align-items: center; font-size: 7.8pt; }
+  .lang-bar { width: 60px; height: 4px; background: #e2e2e2; border-radius: 2px; overflow: hidden; }
+  .lang-bar i { display: block; height: 100%; background: var(--ink); }
+  .interest-line { font-size: 7.6pt; line-height: 1.35; }
+  .interest-line b {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 6.5pt;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    display: block;
+  }
+  .interest-line span { color: #333; }
+  .soft-item { font-size: 7.6pt; line-height: 1.35; padding-left: 10px; position: relative; }
+  .soft-item::before { content: "-"; position: absolute; left: 0; color: var(--faint); }
+
+  /* CareSync project */
+  .proj-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .proj-title { font-size: 12pt; font-weight: 800; letter-spacing: -0.01em; }
+  .proj-meta { font-size: 6.8pt; font-family: var(--font-mono); color: var(--faint); text-transform: uppercase; white-space: nowrap; }
+  .proj-sub { font-size: 8pt; color: #222; margin-top: 2px; line-height: 1.35; }
+  .proj-sub a { color: var(--ink); font-weight: 700; }
+  .stack-strip { display: flex; flex-wrap: wrap; gap: 3.5px; margin-top: 5px; margin-bottom: 3px; }
+  .feature-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 12px;
+    row-gap: 3px;
+    margin-top: 3px;
+  }
+  .feature-cols ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .feature-cols li {
+    font-size: 7.5pt;
+    line-height: 1.35;
+    padding-left: 9px;
+    position: relative;
+  }
+  .feature-cols li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 3.5px;
+    height: 3.5px;
+    background: var(--ink);
+  }
+  .feature-cols li strong { font-weight: 700; }
+  .group-label {
+    font-size: 6.4pt;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--faint);
+    margin-top: 5px;
+    margin-bottom: 2px;
+  }
+  .callout-row { display: flex; gap: 8px; margin-top: 6px; }
+  .callout {
+    flex: 1;
+    border: 1px solid var(--line);
+    padding: 5px 7px;
+    font-size: 7.2pt;
+    line-height: 1.35;
+  }
+  .callout b { display: block; font-size: 7.6pt; margin-bottom: 2px; }
+
+  /* Other projects */
+  .other-proj { display: flex; flex-direction: column; gap: 7px; margin-top: 3px; }
+  .op-card { border-left: 2px solid var(--line); padding-left: 8px; }
+  .op-title { font-size: 8.4pt; font-weight: 800; }
+  .op-meta { font-size: 6.4pt; font-family: var(--font-mono); color: var(--faint); text-transform: uppercase; }
+  .op-desc { font-size: 7.5pt; line-height: 1.35; margin-top: 3px; color: #222; }
+  .keyword-strip { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+  .keyword-strip span {
+    font-size: 6.4pt;
+    font-family: var(--font-mono);
+    border: 1px solid #ccc;
+    padding: 1.5px 5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  footer {
+    border-top: 1.5px solid var(--line);
+    padding: 3.5mm 12mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 6.5pt;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--faint);
+  }
+
+  @media print {
+    body { background: none; padding: 0; margin: 0; }
+    .sheet {
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet" id="cv-sheet">
+  <header>
+    <div>
+      <div class="name-plain">Miguel Macedo</div>
+      <div class="role-line">Full-Stack Developer</div>
+    </div>
+    <div class="contact-block mono">
+      <div>Aveiro, Portugal</div>
+      <div><a href="mailto:cmdaeo@gmail.com">cmdaeo@gmail.com</a></div>
+      <div><a href="https://github.com/cmdaeo" target="_blank" rel="noopener noreferrer">github.com/cmdaeo</a></div>
+    </div>
+  </header>
+
+  <div class="factstrip">
+    <div class="fact"><span class="lbl">Education</span><span class="val">Electrical Eng., Univ. of Aveiro</span></div>
+    <div class="fact"><span class="lbl">Graduation</span><span class="val">2026</span></div>
+    <div class="fact"><span class="lbl">Availability</span><span class="val">Immediate</span></div>
+    <div class="fact"><span class="lbl">Location</span><span class="val">Aveiro</span></div>
+  </div>
+
+  <div class="grid-container">
+    <aside class="sidebar">
+      <section>
+        <div class="sec-title mono">Tech Stack <span>01</span></div>
+        <div class="tag-group">
+          <div class="tag-item"><strong>Frontend</strong><span>React, TypeScript, JavaScript, HTML/CSS</span></div>
+          <div class="tag-item"><strong>Mobile &amp; Cross-Platform</strong><span>Capacitor (Android)</span></div>
+          <div class="tag-item"><strong>Backend &amp; APIs</strong><span>Node.js, Express, REST</span></div>
+          <div class="tag-item"><strong>Databases</strong><span>PostgreSQL, SQL, Supabase, MongoDB</span></div>
+          <div class="tag-item"><strong>Tools</strong><span>Git, GitHub</span></div>
+          <div class="tag-item"><strong>Languages</strong><span>Python, C, C++, Lua, Rust</span></div>
+        </div>
+        <div class="chip-row">
+          <span class="chip fill">React</span><span class="chip fill">Node.js</span><span class="chip fill">TypeScript</span>
+          <span class="chip">Capacitor</span><span class="chip">PostgreSQL</span><span class="chip">Socket.IO</span><span class="chip">OWASP</span>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-title mono">Languages <span>02</span></div>
+        <div class="lang-item"><span>Portuguese</span><div class="lang-bar" aria-label="Portuguese proficiency: 100%"><i style="width:100%"></i></div></div>
+        <div class="lang-item"><span>English</span><div class="lang-bar" aria-label="English proficiency: 85%"><i style="width:85%"></i></div></div>
+      </section>
+
+      <section>
+        <div class="sec-title mono">Interests <span>03</span></div>
+        <div class="interest-line"><b>Frontend &amp; Design</b><span>UI/UX and interface development.</span></div>
+        <div class="interest-line"><b>Marketing</b><span>Product positioning and communication.</span></div>
+        <div class="interest-line"><b>Hardware / IoT</b><span>Sensors, microcontrollers and integration.</span></div>
+        <div class="interest-line"><b>Cybersecurity</b><span>AI-assisted reverse engineering.</span></div>
+      </section>
+
+      <section>
+        <div class="sec-title mono">Soft Skills <span>04</span></div>
+        <div class="soft-item">Quick to learn and adapt to new environments.</div>
+        <div class="soft-item">Clear, direct communication within a team.</div>
+        <div class="soft-item">End-to-end product perspective.</div>
+      </section>
+    </aside>
+
+    <main class="main-col">
+      <section>
+        <div class="sec-title mono">Projects <span>05</span></div>
+        <div class="proj-header-row">
+          <div class="proj-title">CareSync</div>
+          <div class="proj-meta">Full-Stack Lead · DETI Aveiro · Final Project · 2025/2026</div>
+        </div>
+        <div class="proj-sub">
+          Digital health platform for web and mobile (Android app via Capacitor), integrated with the CareBox IoT ecosystem and CareBand wearable to support medication adherence.<br>
+          Repository: <a href="https://github.com/cmdaeo/caresync" target="_blank" rel="noopener noreferrer">github.com/cmdaeo/caresync</a>
+        </div>
+        <div class="stack-strip">
+          <span class="chip fill">React</span><span class="chip fill">TypeScript</span><span class="chip fill">Node.js</span>
+          <span class="chip fill">Capacitor</span><span class="chip">Express</span><span class="chip">PostgreSQL</span>
+          <span class="chip">Sequelize</span><span class="chip">Socket.IO</span><span class="chip">Supabase</span>
+        </div>
+
+        <div class="group-label">Architecture &amp; Security</div>
+        <div class="feature-cols">
+          <ul>
+            <li><strong>Dual-database design:</strong> PII and clinical data stored separately, with AES-256 encryption.</li>
+            <li><strong>Authentication:</strong> rotating JWTs with tokenVersion, 2FA/TOTP and bcrypt.</li>
+            <li><strong>Custom CSRF protection:</strong> HMAC-SHA256 tokens with constant-time verification.</li>
+          </ul>
+          <ul>
+            <li><strong>IoT signature authentication:</strong> device registration using public/private key pairs.</li>
+            <li><strong>Access control:</strong> caregiver–patient model with granular middleware.</li>
+            <li><strong>GDPR:</strong> legal bases, category-based retention, data subject rights and EU-only infrastructure.</li>
+          </ul>
+        </div>
+
+        <div class="group-label">Key Features &amp; Mobile</div>
+        <div class="feature-cols">
+          <ul>
+            <li><strong>Android app (Capacitor):</strong> ported the web app to Android, enabling BLE interactions with the CareBox.</li>
+            <li><strong>AI prescription parser:</strong> regex- or LLM-based extraction of prescription data, followed by user validation.</li>
+          </ul>
+          <ul>
+            <li><strong>Live presentation dashboard:</strong> Server-Sent Events and Supabase Realtime for viewer counts and synchronized highlights between presenter and audience.</li>
+            <li><strong>QR-code reviews:</strong> interactive feedback collection during project demonstrations.</li>
+          </ul>
+        </div>
+
+        <div class="callout-row">
+          <div class="callout"><b>71 Security Tests</b>OWASP ASVS/WSTG audit: 100% pass rate, zero critical findings.</div>
+          <div class="callout"><b>students@deti 2026</b>Public demo at the University of Aveiro, with audience interaction through the review system.</div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-title mono">Other Projects <span>06</span></div>
+        <div class="other-proj">
+          <div class="op-card">
+            <div class="op-title">Technical Content Creation — Lua</div>
+            <div class="op-meta">Personal Project · Education / Scripting</div>
+            <div class="op-desc">Created technical content on Lua scripting, automation and runtime logic, reaching over 1.4 million combined views from an international audience.</div>
+          </div>
+          <div class="op-card">
+            <div class="op-title">Steamworks SDK Research Tool</div>
+            <div class="op-meta">Personal Project · Rust · Private Use</div>
+            <div class="op-desc">Built a Rust CLI for reverse engineering and Steamworks SDK interoperability, using an asynchronous Tokio runtime, secure authentication via the OS keyring and an HTTP client built with reqwest.</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-title mono">Keywords <span>07</span></div>
+        <div class="keyword-strip">
+          <span>React</span><span>TypeScript</span><span>Node.js</span><span>Express</span>
+          <span>Capacitor</span><span>Android</span><span>Lua</span><span>Rust</span>
+          <span>PostgreSQL</span><span>REST API</span><span>Socket.IO</span><span>Git</span>
+          <span>Full-Stack</span><span>OWASP</span><span>LLM Integration</span><span>Cybersecurity</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <span>Miguel Macedo, cmdaeo</span>
+    <span>github.com/cmdaeo</span>
+  </footer>
+</div>
+  
+</body>
+</html>
