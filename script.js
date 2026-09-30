@@ -115,7 +115,7 @@ function App() {
             <section id="explorer" className="explorer-section">
                 <div className="max-w-7xl mx-auto">
                     <div className="section-label">
-                        Tools & Utilities
+                        Projects
                     </div>
 
                     {loading ? (
@@ -131,7 +131,7 @@ function App() {
                         </div>
                     ) : tools.length === 0 ? (
                         <div className="loading-container">
-                            <div className="loading-text">NO TOOLS FOUND</div>
+                            <div className="loading-text">EMPTY</div>
                         </div>
                     ) : (
                         <div className="tools-grid">
